@@ -14,6 +14,9 @@
         <module>item-service</module>
         <module>cart-sercive</module>
         <module>hm-api</module>
+        <module>user-service</module>
+        <module>pay-service</module>
+        <module>trade-service</module>
     </modules>
 
     <parent>
