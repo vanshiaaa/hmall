@@ -1,6 +1,6 @@
-package com.cart.client;
+package com.api.client;
 
-import com.cart.domain.dto.ItemDTO;
+import com.api.dto.ItemDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

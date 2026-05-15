@@ -1,13 +1,11 @@
 package com.cart.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import com.api.client.FeignClient1;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cart.client.FeignClient1;
 import com.cart.domain.dto.CartFormDTO;
-import com.cart.domain.dto.ItemDTO;
+import com.api.dto.ItemDTO;
 import com.cart.domain.po.Cart;
 import com.cart.domain.vo.CartVO;
 import com.cart.mapper.CartMapper;
@@ -19,13 +17,7 @@ import com.hmall.common.utils.UserContext;
 
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Collection;
 import java.util.List;
