@@ -5,6 +5,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cart.client.FeignClient1;
 import com.cart.domain.dto.CartFormDTO;
 import com.cart.domain.dto.ItemDTO;
 import com.cart.domain.po.Cart;
@@ -45,11 +46,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements ICartService {
 
+//
+//    private final RestTemplate restTemplate;
+//
+//    private final DiscoveryClient discoveryClient;
 
-    private final RestTemplate restTemplate;
 
-    private final DiscoveryClient discoveryClient;
-
+    private final FeignClient1 feignClient;
     @Override
     public void addItem2Cart(CartFormDTO cartFormDTO) {
         // 1.获取登录用户
@@ -92,27 +95,28 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         // TODO 1.获取商品id
         Set<Long> itemIds = vos.stream().map(CartVO::getItemId).collect(Collectors.toSet());
         // 2.查询商品
-        // 2.1.1.利用服务发现获取item-service的实例列表 获取实例名称
-        List<ServiceInstance> instances = discoveryClient.getInstances("item-service");
-        // 2.1.2 设置负载均衡策略，随机获取一个实例
-        ServiceInstance serviceInstance = instances.get(RandomUtil.randomInt(instances.size()));
-        ResponseEntity<List<ItemDTO>> response = restTemplate.exchange(
-                serviceInstance.getUri() + "/items?ids={ids}",
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<ItemDTO>>() {
-                },
-                Map.of("ids", CollUtil.join(itemIds, ","))
-        );
-        // 2.2.解析响应
-        if(!response.getStatusCode().is2xxSuccessful()){
-            // 查询失败，直接结束
-            return;
-        }
-        List<ItemDTO> items = response.getBody();
-        if (CollUtils.isEmpty(items)) {
-            return;
-        }
+        List<ItemDTO> items = feignClient.queryItemByIds(itemIds);
+//        // 2.1.1.利用服务发现获取item-service的实例列表 获取实例名称
+//        List<ServiceInstance> instances = discoveryClient.getInstances("item-service");
+//        // 2.1.2 设置负载均衡策略，随机获取一个实例
+//        ServiceInstance serviceInstance = instances.get(RandomUtil.randomInt(instances.size()));
+//        ResponseEntity<List<ItemDTO>> response = restTemplate.exchange(
+//                serviceInstance.getUri() + "/items?ids={ids}",
+//                HttpMethod.GET,
+//                null,
+//                new ParameterizedTypeReference<List<ItemDTO>>() {
+//                },
+//                Map.of("ids", CollUtil.join(itemIds, ","))
+//        );
+//        // 2.2.解析响应
+//        if(!response.getStatusCode().is2xxSuccessful()){
+//            // 查询失败，直接结束
+//            return;
+//        }
+//        List<ItemDTO> items = response.getBody();
+//        if (CollUtils.isEmpty(items)) {
+//            return;
+//        }
         // 3.转为 id 到 item的map
         Map<Long, ItemDTO> itemMap = items.stream().collect(Collectors.toMap(ItemDTO::getId, Function.identity()));
         // 4.写入vo
