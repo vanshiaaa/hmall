@@ -1271,3 +1271,5 @@ com.hmall.common.exception.UnauthorizedException: 未登录
 20:04:04:273 DEBUG 57048 --- [http-nio-8080-exec-5] com.hmall.mapper.UserMapper.selectList   : ==>  Preparing: SELECT id,username,password,phone,create_time,update_time,status,balance FROM user WHERE (username = ?)
 20:04:04:328 DEBUG 57048 --- [http-nio-8080-exec-5] com.hmall.mapper.UserMapper.selectList   : ==> Parameters: jack(String)
 20:04:04:396 DEBUG 57048 --- [http-nio-8080-exec-5] com.hmall.mapper.UserMapper.selectList   : <==      Total: 1
+20:14:33:888  INFO 57048 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+20:14:33:902  INFO 57048 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
