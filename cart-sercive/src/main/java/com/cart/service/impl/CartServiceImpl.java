@@ -1,7 +1,7 @@
 package com.cart.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.api.client.FeignClient1;
+import com.api.client.ItemClient;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cart.domain.dto.CartFormDTO;
@@ -44,7 +44,7 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
 //    private final DiscoveryClient discoveryClient;
 
 
-    private final FeignClient1 feignClient;
+    private final ItemClient feignClient;
     @Override
     public void addItem2Cart(CartFormDTO cartFormDTO) {
         // 1.获取登录用户
