@@ -6,10 +6,10 @@ import feign.RequestTemplate;
 import org.springframework.context.annotation.Bean;
 
 public class DefaltFeignLevel {
-    @Bean
-    public feign.Logger.Level feignLoggerLevel() {
-        return feign.Logger.Level.FULL;
-    }
+//    @Bean
+//    public feign.Logger.Level feignLoggerLevel() {
+//        return feign.Logger.Level.FULL;
+//    }
     public RequestInterceptor userInfoRequestInterceptor() {
         return new RequestInterceptor() {
             @Override
