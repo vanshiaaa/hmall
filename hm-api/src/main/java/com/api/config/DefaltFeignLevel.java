@@ -1,5 +1,6 @@
 package com.api.config;
 
+import com.api.client.fallback.ItemClientFallback;
 import com.hmall.common.utils.UserContext;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
@@ -10,6 +11,7 @@ public class DefaltFeignLevel {
 //    public feign.Logger.Level feignLoggerLevel() {
 //        return feign.Logger.Level.FULL;
 //    }
+    @Bean
     public RequestInterceptor userInfoRequestInterceptor() {
         return new RequestInterceptor() {
             @Override
@@ -24,5 +26,10 @@ public class DefaltFeignLevel {
                 template.header("user-info", userId.toString());
             }
         };
+    }
+
+    @Bean
+    public ItemClientFallback itemClientFallback(){
+        return new ItemClientFallback();
     }
 }
