@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 #spring:
 #  application:
 #    name: trade-service # 服务名称
@@ -43,19 +43,16 @@
 #  service:
 #    vgroup-mapping:
 #      hmall: default
-spring:
-  application:
-    name: trade-service
-=======
+
+
 spring:
   application:
     name: trade-service # 服务名称
->>>>>>> origin/main
+
   profiles:
     active: dev
   cloud:
     nacos:
-<<<<<<< HEAD
       server-addr: 192.168.121.162:8848
       config:
         file-extension: yaml
@@ -63,32 +60,32 @@ spring:
           - dataId: shared-jdbc.yaml
           - dataId: shared-log.yaml
           - dataId: shared-swagger.yaml
+          - dataId: shared-seata.yaml
 
-seata:
-  enabled: true
-  registry:
-    type: nacos
-    nacos:
-      server-addr: 192.168.121.162:8848
-      namespace: ""
-      group: DEFAULT_GROUP
-      application: seata-server
-      username: nacos
-      password: nacos
-  tx-service-group: hmall
-  service:
-    vgroup-mapping:
-      hmall: default
-  client:
-    tm:
-      default-global-transaction-timeout: 30000
-=======
-      server-addr: 192.168.121.162 # nacos地址
-      config:
-        file-extension: yaml # 文件后缀名
-        shared-configs: # 共享配置
-          - dataId: shared-jdbc.yaml # 共享mybatis配置
-          - dataId: shared-log.yaml # 共享日志配置
-          - dataId: shared-swagger.yaml # 共享日志配置
-          - dataId: shared-seata.yaml # 共享seata配置
->>>>>>> origin/main
+#seata:
+#  enabled: true
+#  registry:
+#    type: nacos
+#    nacos:
+#      server-addr: 192.168.121.162:8848
+#      namespace: ""
+#      group: DEFAULT_GROUP
+#      application: seata-server
+#      username: nacos
+#      password: nacos
+#  tx-service-group: hmall
+#  service:
+#    vgroup-mapping:
+#      hmall: default
+#  client:
+#    tm:
+#      default-global-transaction-timeout: 30000
+#      server-addr: 192.168.121.162 # nacos地址
+#      config:
+#        file-extension: yaml # 文件后缀名
+#        shared-configs: # 共享配置
+#          - dataId: shared-jdbc.yaml # 共享mybatis配置
+#          - dataId: shared-log.yaml # 共享日志配置
+#          - dataId: shared-swagger.yaml # 共享日志配置
+#          - dataId: shared-seata.yaml # 共享seata配置
+#
