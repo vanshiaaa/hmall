@@ -17,6 +17,7 @@ public class UserInfoInterceptor implements HandlerInterceptor {
             // 不为空，保存到ThreadLocal
             UserContext.setUser(Long.valueOf(userInfo));
         }
+        System.out.println(UserContext.getUser());
         // 3.放行
         return true;
     }

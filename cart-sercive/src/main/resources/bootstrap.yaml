@@ -12,3 +12,4 @@ spring:
           - data-Id: shared-jdbc.yaml # 共享mybatis配置
           - data-Id: shared-log.yaml # 共享日志配置
           - data-Id: shared-swagger.yaml # 共享日志配置
+          - data-id: shared-seata.yaml

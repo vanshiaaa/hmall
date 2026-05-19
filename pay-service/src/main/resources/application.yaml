@@ -10,6 +10,13 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: ${hm.db.pw}
+
+  rabbitmq:
+    host: 192.168.121.162 # 你的虚拟机IP
+    port: 5672 # 端口
+    virtual-host: / # 虚拟主机
+    username: itheima # 用户名
+    password: 123321 # 密码
   cloud:
     nacos:
       server-addr: 192.168.121.162:8848
