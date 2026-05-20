@@ -61,10 +61,10 @@ hm:
     package: com.trade.controller
   db:
     database: hm-trade
-spring:
-  rabbitmq:
-    host: 192.168.121.162 # 你的虚拟机IP
-    port: 5672 # 端口
-    virtual-host: / # 虚拟主机
-    username: itheima # 用户名
-    password: 123321 # 密码
+#spring:
+#  rabbitmq:
+#    host: 192.168.121.162 # 你的虚拟机IP
+#    port: 5672 # 端口
+#    virtual-host: / # 虚拟主机
+#    username: itheima # 用户名
+#    password: 123321 # 密码

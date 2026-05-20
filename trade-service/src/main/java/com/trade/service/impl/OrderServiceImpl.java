@@ -4,6 +4,7 @@ import com.api.client.CartClient;
 import com.api.client.ItemClient;
 import com.api.dto.OrderDetailDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hmall.common.domain.CartClearDTO;
 import com.hmall.common.exception.BadRequestException;
 import com.hmall.common.utils.UserContext;
 import com.api.dto.ItemDTO;
@@ -17,6 +18,8 @@ import com.trade.service.IOrderDetailService;
 import com.trade.service.IOrderService;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +39,7 @@ import java.util.stream.Collectors;
  * @since 2023-05-05
  */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements IOrderService {
 
@@ -45,6 +49,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     private final CartClient cartClient;
     private final ItemClient itemClient;
+    private final RabbitTemplate rabbitTemplate;
     @Override
     @GlobalTransactional
     public Long createOrder(OrderFormDTO orderFormDTO) {
@@ -78,8 +83,19 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         List<OrderDetail> details = buildDetails(order.getId(), items, itemNumMap);
         detailService.saveBatch(details);
 
-        // 3.清理购物车商品
-        cartClient.removeByItemIds(itemIds);
+        //Todo 3.清理购物车商品
+//        cartClient.removeByItemIds(itemIds);
+
+
+        try {
+            rabbitTemplate.convertAndSend("trade.topic", "order.create", itemIds, message -> {
+                message.getMessageProperties().setHeader("userId", UserContext.getUser());
+                return message;
+            });
+        } catch (Exception e) {
+            log.error("清理购物车的消息发送失败，用户id：{}，商品id：{}",
+                    UserContext.getUser(), itemIds, e);
+        }
 
         // 4.扣减库存
         try {

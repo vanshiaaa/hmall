@@ -61,6 +61,7 @@ spring:
           - dataId: shared-log.yaml
           - dataId: shared-swagger.yaml
           - dataId: shared-seata.yaml
+          - dataId: shared-rabbitmq.yaml
 
 #seata:
 #  enabled: true
