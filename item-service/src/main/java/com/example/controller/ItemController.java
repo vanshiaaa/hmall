@@ -81,4 +81,8 @@ public class ItemController {
     public void deductStock(@RequestBody List<OrderDetailDTO> items){
         itemService.deductStock(items);
     }
+
+    public void recoverStock(Long itemId, Integer num){
+        itemService.recoverStock(itemId, num);
+    }
 }

@@ -22,4 +22,7 @@ public interface ItemClient {
 
     @PutMapping("/items/stock/deduct")
     void deductStock(@RequestBody  List<OrderDetailDTO> detailDTOS);
+
+    @PutMapping("/items/stock/recover")
+    void recoverStock(Long itemId, Integer num);
 }
