@@ -79,6 +79,15 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         }
     }
 
+    @Override
+    public void updatePayStatusById(Long orderId) {
+        lambdaUpdate()
+                .set(PayOrder::getStatus, PayStatus.TRADE_SUCCESS.getValue())
+                .set(PayOrder::getPaySuccessTime, LocalDateTime.now())
+                .eq(PayOrder::getBizOrderNo, orderId)
+                .update();
+    }
+
     public boolean markPayOrderSuccess(Long id, LocalDateTime successTime) {
         return lambdaUpdate()
                 .set(PayOrder::getStatus, PayStatus.TRADE_SUCCESS.getValue())

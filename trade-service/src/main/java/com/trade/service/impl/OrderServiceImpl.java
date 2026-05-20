@@ -2,6 +2,7 @@ package com.trade.service.impl;
 
 import com.api.client.CartClient;
 import com.api.client.ItemClient;
+import com.api.client.PayClient;
 import com.api.dto.OrderDetailDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmall.common.domain.CartClearDTO;
@@ -10,6 +11,7 @@ import com.hmall.common.utils.UserContext;
 import com.api.dto.ItemDTO;
 
 
+import com.trade.constant.MQConstants;
 import com.trade.domain.dto.OrderFormDTO;
 import com.trade.domain.po.Order;
 import com.trade.domain.po.OrderDetail;
@@ -50,6 +52,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final CartClient cartClient;
     private final ItemClient itemClient;
     private final RabbitTemplate rabbitTemplate;
+    private final PayClient payClient;
+    private final IOrderDetailService orderDetailService;
     @Override
     @GlobalTransactional
     public Long createOrder(OrderFormDTO orderFormDTO) {
@@ -83,7 +87,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         List<OrderDetail> details = buildDetails(order.getId(), items, itemNumMap);
         detailService.saveBatch(details);
 
-        //Todo 3.清理购物车商品
+        // 3.清理购物车商品
 //        cartClient.removeByItemIds(itemIds);
 
 
@@ -103,6 +107,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         } catch (Exception e) {
             throw new RuntimeException("库存不足！");
         }
+        // 5.发送延时消息，检测订单是否支付成功
+        rabbitTemplate.convertAndSend(
+                MQConstants.DELAY_EXCHANGE_NAME,
+                MQConstants.DELAY_ORDER_KEY,
+                order.getId(),
+                message -> {
+                    message.getMessageProperties().setDelay(10000);
+                    return message;
+                }
+        );
         return order.getId();
     }
 
@@ -113,6 +127,27 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setStatus(2);
         order.setPayTime(LocalDateTime.now());
         updateById(order);
+    }
+
+    @Override
+    public void cancelOrder(Long orderId) {
+//        Order order = getById(orderId);
+//        order.setStatus(5);
+//        update(order).
+        // 1.修改为已取消
+        lambdaUpdate()
+                .eq(Order::getId,orderId)
+                .set(Order::getStatus,5)
+                .update();
+        // 2.更新支付单已取消
+        payClient.updatePayStatus(orderId);
+
+
+        // 3.回复库存
+
+        orderDetailService.recoverStock(orderId);
+
+
     }
 
     private List<OrderDetail> buildDetails(Long orderId, List<ItemDTO> items, Map<Long, Integer> numMap) {

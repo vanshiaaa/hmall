@@ -14,4 +14,5 @@ import com.trade.domain.po.OrderDetail;
  */
 public interface IOrderDetailService extends IService<OrderDetail> {
 
+    void recoverStock(Long orderId);
 }
