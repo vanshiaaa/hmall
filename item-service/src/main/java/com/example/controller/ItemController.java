@@ -82,7 +82,11 @@ public class ItemController {
         itemService.deductStock(items);
     }
 
-    public void recoverStock(Long itemId, Integer num){
+    @PutMapping("/stock/recover")
+    public void recoverStock(
+            @RequestParam Long itemId,
+            @RequestParam Integer num
+    ) {
         itemService.recoverStock(itemId, num);
     }
 }

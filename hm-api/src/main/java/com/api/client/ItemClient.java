@@ -24,5 +24,8 @@ public interface ItemClient {
     void deductStock(@RequestBody  List<OrderDetailDTO> detailDTOS);
 
     @PutMapping("/items/stock/recover")
-    void recoverStock(Long itemId, Integer num);
+    void recoverStock(
+            @RequestParam("itemId") Long itemId,
+            @RequestParam("num") Integer num
+    );
 }
