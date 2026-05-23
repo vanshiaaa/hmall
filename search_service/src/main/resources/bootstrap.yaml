@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: search-service # 服务名称
+
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      server-addr: 192.168.121.162:8848
+      config:
+        file-extension: yaml
+        shared-configs:
+          - dataId: shared-log.yaml
+          - dataId: shared-swagger.yaml
+          - dataId: shared-seata.yaml
+          - dataId: shared-rabbitmq.yaml
