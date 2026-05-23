@@ -5,9 +5,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.json.ObjectMapper;
 import com.hmall.common.domain.PageDTO;
+import com.hmall.common.domain.PageQuery;
 import com.search.domain.dto.ItemDTO;
 import com.search.domain.po.ItemDoc;
 import com.search.domain.query.ItemPageQuery;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -26,18 +28,23 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.sort.SortOrder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Slf4j
-@RestController("/search")
+@Api(tags = "搜索相关接口")
+@RestController
+@RequestMapping("/search")
 public class SearchController {
     private  final RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(
             HttpHost.create("192.168.121.162:9200")
@@ -47,7 +54,7 @@ public class SearchController {
     @GetMapping("/{id}")
     public ItemDTO search(@PathVariable Long id) throws Exception {
 
-        GetRequest request = new GetRequest("item").id(id.toString());
+        GetRequest request = new GetRequest("items").id(id.toString());
 
         GetResponse response = client.get(request, RequestOptions.DEFAULT);
 
@@ -65,7 +72,7 @@ public class SearchController {
     @ApiOperation("搜索接口")
     public PageDTO<ItemDoc> search(ItemPageQuery query) throws IOException {
         // 1.构建查询条件
-        SearchRequest request = new SearchRequest("item");
+        SearchRequest request = new SearchRequest("items");
         BoolQueryBuilder bool = new BoolQueryBuilder();
         // 2.执行查询
         if (StrUtil.isNotBlank(query.getKey())){
@@ -114,5 +121,42 @@ public class SearchController {
             list.add(JSONUtil.toBean(hit.getSourceAsString(),ItemDoc.class));
         }
         return new PageDTO<>(total,10L,list);
+    }
+
+    @ApiOperation("过滤聚合方法")
+    @PostMapping("/filters")
+    public Map <String, List<String>> filters(@RequestBody ItemPageQuery query) throws IOException {
+        // TODO 1.构建查询条件，执行查询
+        SearchRequest request = new SearchRequest("items");
+        BoolQueryBuilder bool = new BoolQueryBuilder();
+        // 2.执行查询
+        if (StrUtil.isNotBlank(query.getKey())){
+            bool.must().add(QueryBuilders.matchQuery("name",query.getKey()));
+        }
+        if (StrUtil.isNotBlank(query.getBrand())){
+            bool.filter().add(QueryBuilders.termQuery("brand",query.getBrand()));
+        }
+        if (StrUtil.isNotBlank(query.getCategory())){
+            bool.filter().add(QueryBuilders.termQuery("category",query.getCategory()));
+        }
+        if (query.getMinPrice() != null){
+            bool.filter().add(QueryBuilders.rangeQuery("price").gte(query.getMinPrice()));
+        }
+        if (query.getMaxPrice() != null){
+            bool.filter().add(QueryBuilders.rangeQuery("price").lte(query.getMaxPrice()));
+        }
+        request.source().query(bool);
+
+        // TODO 2.解析聚合结果并返回
+        request.source().aggregation(AggregationBuilders.terms("brandAgg").field("brand").size(20));
+        request.source().aggregation(AggregationBuilders.terms("categoryAgg").field("category").size(20));
+        SearchResponse response = client.search(request, RequestOptions.DEFAULT);
+        Aggregations aggregations = response.getAggregations();
+        Aggregation brandAgg = aggregations.get("brandAgg");
+        Aggregation categoryAgg = aggregations.get("categoryAgg");
+        Map<String, List<String>> result =  new HashMap<>();
+            result.put("brand",((org.elasticsearch.search.aggregations.bucket.terms.Terms) brandAgg).getBuckets().stream().map(bucket -> bucket.getKeyAsString()).toList());
+            result.put("category",((org.elasticsearch.search.aggregations.bucket.terms.Terms) categoryAgg).getBuckets().stream().map(bucket -> bucket.getKeyAsString()).toList());
+            return result;
     }
 }

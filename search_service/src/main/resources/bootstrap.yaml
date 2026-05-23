@@ -10,7 +10,8 @@ spring:
       config:
         file-extension: yaml
         shared-configs:
+          - dataId: shared-jdbc.yaml
           - dataId: shared-log.yaml
           - dataId: shared-swagger.yaml
-          - dataId: shared-seata.yaml
           - dataId: shared-rabbitmq.yaml
+          - dataId: shared-seata.yaml
